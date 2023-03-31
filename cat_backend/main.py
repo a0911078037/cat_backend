@@ -56,16 +56,10 @@ def get_cat():
         df = dao.get(query_data)
         for d in df:
             return_data = {}
-            # with open(d['photo'], 'rb') as photo:
-            #     return_data['photo'] = json.dumps(base64.b64encode(photo.read()), cls=Base64Encoder)
-            # # photo_album
-            # path = glob.glob(f'./cat_image_base/{d["_id"]}/photo_album/*')
-            # photo_album_list = []
-            # for p in path:
-            #     with open(p, 'rb') as photo_album:
-            #         photo_album_list.append(json.dumps(base64.b64encode(photo_album.read()), cls=Base64Encoder))
             return_data['photo'] = d['photo']
             return_data['photo_album_list'] = glob.glob(f'./cat_image_base/{d["_id"]}/photo_album/*')
+            for i, path in enumerate(return_data['photo_album_list']):
+                return_data['photo_album_list'][i] = os.path.abspath(path)
             return_data['uid'] = d['_id']
             return_data['name'] = d['name']
             return_data['age'] = d['age']
@@ -114,6 +108,7 @@ def create_cat():
                 os.mkdir(f'./cat_image_base/{uid}')
             image_path = f'./cat_image_base/{uid}/{uid}.{image.filename.rsplit(".", 1)[1].lower()}'
             image.save(image_path)
+            image_path = os.path.abspath(image_path)
 
         photo_album_list = request.files.getlist('photo_album[]')
         if photo_album_list:
